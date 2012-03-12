@@ -33,10 +33,10 @@
 |
 */
 
-Route::get('/, home', function()
+Route::get('/, home', array('before' => 'before', function()
 {
-	return View::make('home.index');
-});
+	return array('foo' => 'bar');
+}));
 
 /*
 |--------------------------------------------------------------------------
@@ -109,4 +109,8 @@ Route::filter('csrf', function()
 Route::filter('auth', function()
 {
 	if (Auth::guest()) return Redirect::to('login');
+});
+
+Laravel\Mutator::register('json', function($content) {
+	return json_encode($content);
 });

@@ -23,6 +23,14 @@ class Response {
 	 */
 	public $headers = array();
 
+
+	/**
+	 * The response mutator.
+	 *
+	 * @var string
+	 */
+	public $mutator = NULL;
+
 	/**
 	 * HTTP status codes.
 	 *
@@ -233,7 +241,7 @@ class Response {
 		{
 			$this->content = $this->content->__toString();
 		}
-		else if (Config::get('application.late_stringification'))
+		else if (Config::get('application.late_stringification') && $this->mutator != 'string')
 		{
 			$this->content = (string) $this->content;
 		}
@@ -250,7 +258,7 @@ class Response {
 	{
 		if ( ! headers_sent()) $this->send_headers();
 
-		echo (string) $this->content;
+		echo Mutator::run($this->mutator, $this->content);
 	}
 
 	/**
