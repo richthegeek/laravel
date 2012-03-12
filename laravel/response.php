@@ -233,7 +233,7 @@ class Response {
 		{
 			$this->content = $this->content->__toString();
 		}
-		else
+		else if (Config::get('application.late_stringification'))
 		{
 			$this->content = (string) $this->content;
 		}
