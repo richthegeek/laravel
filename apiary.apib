@@ -1,0 +1,75 @@
+FORMAT: 1A
+HOST: http://polls.apiblueprint.org/
+
+# Veoo Subscription API
+
+This API provides an interface for managing subscription lists for SMS messaging.
+
+## Group Authentication
+All requests are authenticated using a HMAC scheme. Authenticated users of the system will have:
++ A **key** such as `c28e3d5a` or `gruser`
++ A 32-character **secret** such as `7c1ed1cbf0d6ed94c4ca836eba76fb54`
+
+Requests should be sent with the query parameters as: `?key=c28e3d5a&hash=612ffb63b9c2866d937418b294b6716640e9bb1e`
+where the *hash* is computed by performing a HMAC-sha1 of the pathname and body against the secret. An example of doing this in Node.JS:
+>   
+    crypto = require('crypto');
+    hmac = crypto.createHmac('sha1', veoo_secret);
+    hmac.update(pathname);
+    hmac.update(JSON.stringify(body || {}));
+    hash = hmac.digest('hex');
+
+Notes:
+* The pathname excludes the domain and query strings, and includes the leading slash.
+* If the body is empty or undefined, use `{}`.
+
+## Group Lists
+Lists are services, with MSISDNs attached.
+## Service [/lists/{service_id}]
++ Model (application/json)
+
+        {_id: "service_id", dest: "12345", description: "A description"}
+
++ Parameters
+    + service_id: (required, UUID) - Identifier for this service
+
+### View a service [GET]
++ Response 200
+
+    [Service][]
+
+
+## Subscriber [/lists/{service_id}/subscriber/{msisdn}]
+
++ Model (application/json)
+
+        {
+            _id: {
+                msisdn: "441234567890",
+                service_id: "de305d54-75b4-431b-adb2-eb6b9e546014"
+            },
+            created_at: "2015-05-22T11:34:56.000Z"
+        }
+
++ Parameters
+    + service_id: (required, UUID) - Identifier for this service
+    + msisdn: (required, MSISDN) - MSISDN of the subscriber
+    
+### Add a subscription [POST]
++ Request
+    
+        {"keyword": "optional_keyword"}
+
++ Response 201
+
+    [Subscriber][]
+
+### View information about a subscription [GET]
++ Response 200
+
+    [Subscriber][]
+
+### Delete a subscription [DELETE]
++ Response 200
+
+        OK
